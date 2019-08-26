@@ -166,8 +166,6 @@ public class CopyOfAgenda {
     }
 
     public static void ordenarLista() {
-        for(int i = 0; i < agenda.size(); ++i) {
-       
-        }
+       CopyOfAuxiliar.sort
     }
 }
