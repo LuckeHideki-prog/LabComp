@@ -1,27 +1,29 @@
-import java.io.*;
-import java.util.*;
-public class CopyOfAgenda {
+public class Agenda
+{
     static List<CopyOfAuxiliar> agenda;
     static Scanner scanner;
-    public static void main(String[] args) throws IOException {
+    public static void main (String args[]) throws IOException{
+        int opcao = -1;
         scanner = new Scanner(System.in);
         agenda = new ArrayList();
-        int opcao = -1;
         File arquivo = new File("agendaTelefonica.csv");
         if (arquivo.exists()){
             lerArquivo();
         }
-        while (opcao != 0){
-            System.out.println("Menu Principal");
-            System.out.println(" 1.Adicionar Contato");
-            System.out.println(" 2.Excluir Contato");
-            System.out.println(" 3.Listar Contatos");
-            System.out.println(" 4.Editar Contato");
-            System.out.println(" 5.Procurar Contato");
-            System.out.println(" 0.Encerrar");
+        while (opcao != 0){        
+            System.out.println("Seleciona uma das opções do menu:");
+            System.out.println("1- Listar CopyOfAuxiliars.");
+            System.out.println("2- Adicionar novo CopyOfAuxiliar.");
+            System.out.println("3- Editar CopyOfAuxiliar existente.");
+            System.out.println("4- Remover CopyOfAuxiliar existente.");
+            System.out.println("5- Pesquisar telefone pelo nome.");
+            System.out.println("0- Finalizar programa.");
             opcao = scanner.nextInt(); 
-            if (opcao > 0) comando(opcao);
-        } 
+            if (opcao > 0) executaAcao(opcao);
+        }
+        if (!agenda.isEmpty()){
+            gravarArquivo();
+        }
     }
 
     public static void lerArquivo() throws IOException{
@@ -35,137 +37,140 @@ public class CopyOfAgenda {
         }
         bufferedReader.close();
     }
-    
+
     public static void gravarArquivo() throws IOException{
         FileWriter fileWriter = new FileWriter(new File("agendaTelefonica.csv"));
         for (int i = 0; i < agenda.size(); i++){
-            CopyOfAuxiliar contato = agenda.get(i);      
+            CopyOfAuxiliar CopyOfAuxiliar = agenda.get(i);      
             if (i > 0) fileWriter.write("\n");
-            fileWriter.write(contato.nome + ";" + contato.telefone);
+            fileWriter.write(CopyOfAuxiliar.nome + ";" + CopyOfAuxiliar.telefone);
         }
         fileWriter.close();
     }
-    
-    public static void comando(int opcao){
+
+    public static void executaAcao(int opcao){
         if (agenda.isEmpty() && (opcao == 1 || opcao == 3 || opcao == 4 || opcao == 5)){
-            System.out.println("A agenda esta vazia.");
+            System.out.println("A lista esta vazia.");
             return;
         }
         if (opcao == 1){
-            AdicionarContato();
-        }else if (opcao == 2){
-            ExcluirContato();
-        }else if (opcao == 3){
-            ListarContatos();
-        }else if (opcao == 4){
-            EditarContato();
-        }else if (opcao == 5){    
-            ProcurarContato();
+            listarCopyOfAuxiliars();
+        } else if (opcao == 2){
+            adicionarCopyOfAuxiliar();
+        } else if (opcao == 3){
+            editarCopyOfAuxiliar();
+        } else if (opcao == 4){
+            removerCopyOfAuxiliar();
+        } else if (opcao == 5){
+            procurarCopyOfAuxiliar();
+        }
+    }
+    
+    public static void procurarCopyOfAuxiliar(){
+        scanner.nextLine();
+        System.out.println("Digite o nome do CopyOfAuxiliar:");
+        String nomePesquisado = scanner.nextLine();
+        if (nomePesquisado.equals("")){
+            System.out.println("Nome inválido");
+            return;
+        }
+        int indice = retornaIndice(nomePesquisado);
+        if (indice == -1){
+            System.out.println("CopyOfAuxiliar não encontrado.");
+            return;
+        }
+        
+        System.out.println("O telefone deste CopyOfAuxiliar é: " + agenda.get(indice).telefone);
+    }
+
+    public static void listarCopyOfAuxiliars(){
+        for (int i = 0; i < agenda.size(); i++){
+            CopyOfAuxiliar CopyOfAuxiliar = agenda.get(i);
+            System.out.println("Nome: " + CopyOfAuxiliar.nome + " - Telefone: " + CopyOfAuxiliar.telefone);
         }
     }
 
-    public static void AdicionarContato() {
+    public static void adicionarCopyOfAuxiliar(){
         scanner.nextLine();
-        CopyOfAuxiliar contato = new CopyOfAuxiliar();
-        System.out.println("Digite o nome do contato:");
+        CopyOfAuxiliar CopyOfAuxiliar = new CopyOfAuxiliar();
+        System.out.println("Digite o nome do CopyOfAuxiliar:");
         String lido = scanner.nextLine();
-        if (lido != null) {
-            contato.nome = lido;
+        if (lido != null){
+            CopyOfAuxiliar.nome = lido;
         }
-
-        System.out.println("Digite o telefone do contato:");
+        System.out.println("Digite o telefone do CopyOfAuxiliar:");
         lido = scanner.nextLine();
-        if (lido != null) {
-            contato.telefone = lido;
+        if (lido != null){
+            CopyOfAuxiliar.telefone = lido;
         }
-
-        agenda.add(contato);
+        agenda.add(CopyOfAuxiliar);
     }
 
-    public static void ExcluirContato() {
+    public static void editarCopyOfAuxiliar(){
         scanner.nextLine();
-        System.out.println("Digite o nome do contato:");
+        System.out.println("Digite o nome do CopyOfAuxiliar:");
         String nomePesquisado = scanner.nextLine();
-        if (nomePesquisado.equals("")) {
+        if (nomePesquisado.equals("")){
             System.out.println("Nome inválido");
-        } else {
-            int indice = retornaIndice(nomePesquisado);
-            if (indice == -1) {
-                System.out.println("Contato não encontrado.");
-            } else {
-                try {
-                    agenda.remove(indice);
-                    System.out.println("Contato removido.");
-                } catch (Exception var3) {
-                    System.out.println("Falha na remoção do contato. Motivo: " + var3);
-                }
-            }
+            return;
         }
-    }
+        int indice = retornaIndice(nomePesquisado);
+        if (indice == -1){
+            System.out.println("CopyOfAuxiliar não encontrado.");
+            return;
+        }
 
-    public static void ProcurarContato() {
+        System.out.println("Selecione o que deseja alterar:");
+        System.out.println("1- Nome");
+        System.out.println("2- Telefone");
+        int opcao = scanner.nextInt();
         scanner.nextLine();
-        System.out.println("Digite o nome do contato:");
-        String nomePesquisado = scanner.nextLine();
-        if (nomePesquisado.equals("")) {
-            System.out.println("Nome inválido");
+        if (opcao == 1){
+            System.out.println("Digite o novo nome: ");
+            agenda.get(indice).nome = scanner.nextLine();
+        } else if (opcao == 2){
+            System.out.println("Digite o novo telefone: ");    
+            agenda.get(indice).telefone = scanner.nextLine();        
         } else {
-            int indice = retornaIndice(nomePesquisado);
-            if (indice == -1) {
-                System.out.println("Contato não encontrado.");
-            } else {
-                System.out.println("O telefone deste contato é: " + ((CopyOfAuxiliar)agenda.get(indice)).telefone);
-            }
+            System.out.println("Opção inválida.");
         }
+
     }
 
-    public static void EditarContato() {
+    public static void removerCopyOfAuxiliar(){
         scanner.nextLine();
-        System.out.println("Digite o nome do contato:");
+        System.out.println("Digite o nome do CopyOfAuxiliar:");
         String nomePesquisado = scanner.nextLine();
-        if (nomePesquisado.equals("")) {
+        if (nomePesquisado.equals("")){
             System.out.println("Nome inválido");
-        } else {
-            int indice = retornaIndice(nomePesquisado);
-            if (indice == -1) {
-                System.out.println("Contato não encontrado.");
-            } else {
-                System.out.println("Selecione o que deseja alterar:");
-                System.out.println("1- Nome");
-                System.out.println("2- Telefone");
-                int opcao = scanner.nextInt();
-                scanner.nextLine();
-                if (opcao == 1) {
-                    System.out.println("Digite o novo nome: ");
-                    ((CopyOfAuxiliar)agenda.get(indice)).nome = scanner.nextLine();
-                } else if (opcao == 2) {
-                    System.out.println("Digite o novo telefone: ");
-                    ((CopyOfAuxiliar)agenda.get(indice)).telefone = scanner.nextLine();
-                } else {
-                    System.out.println("Opção inválida.");
-                }
-            }
+            return;
         }
-
+        int indice = retornaIndice(nomePesquisado);
+        if (indice == -1){
+            System.out.println("CopyOfAuxiliar não encontrado.");
+            return;
+        }
+        try {
+            agenda.remove(indice);
+            System.out.println("CopyOfAuxiliar removido.");
+        } catch(Exception e) {
+            System.out.println("Falha na remoção do CopyOfAuxiliar. Motivo: " + e);
+        }        
     }
 
-    public static void ListarContatos() {
-        for(int i = 0; i < agenda.size(); ++i) {
-            CopyOfAuxiliar contato = agenda.get(i);
-            System.out.println("Nome: " + contato.nome + " - Telefone: " + contato.telefone);
-        }
-    }
-
-    public static int retornaIndice(String nome) {
-        for(int i = 0; i < agenda.size(); ++i) {
-            if (((CopyOfAuxiliar)agenda.get(i)).nome.toUpperCase().equals(nome.toUpperCase())) {
+    public static int retornaIndice(String nome){
+        for (int i = 0; i < agenda.size(); i++){
+            if (agenda.get(i).nome.toUpperCase().equals(nome.toUpperCase())){
                 return i;
-            }
+            }            
         }
         return -1;
     }
-
-    public static void ordenarLista() {
-       CopyOfAuxiliar.sort
+    
+    public static void ordenarLista(){
+        
+            
+        }
     }
-}
+
+
